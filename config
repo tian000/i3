@@ -7,9 +7,29 @@
 
 # i3 config file (v4)
 #
-# Please see http://i3wm.org/docs/userguide.html for a complete reference!
+# Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
 set $mod Mod1
+
+# Set the background
+# exec --no-startup-id sh ~/.fehbg
+
+# Set up wifi + volume
+exec --no-startup-id nm-applet
+bindsym XF86AudioRaiseVolume exec "amixer -q sset Master,0 1+ unmute"
+bindsym XF86AudioLowerVolume exec "amixer -q sset Master,0 1- unmute"
+bindsym XF86AudioMute exec "amixer -q sset Master,0 toggle; amixer -q sset Headphone,0 toggle; amixer -q sset Speaker,0 toggle"
+bindsym $mod+Shift+n exec --no-startup-id "killall nm-applet; sleep 2; nm-applet"
+
+# Screen Brightness up / down
+# Screen brightness controls with notification
+bindsym XF86MonBrightnessUp exec "light -A 5"
+bindsym XF86MonBrightnessDown exec "light -U 5"
+
+
+# Finer controls
+bindsym Shift+XF86MonBrightnessDown exec "python ~/.brightness_control.py -0.02"
+bindsym Shift+XF86MonBrightnessUp exec "python ~/.brightness_control.py 0.02"
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -32,15 +52,36 @@ floating_modifier $mod
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
 
+# start ranger
+bindsym $mod+Shift+f exec xterm -e ranger
+
+# start chrome
+bindsym $mod+c exec google-chrome
+
 # kill focused window
 bindsym $mod+Shift+q kill
 
+# Initiate Shutdown
+set $mode_system System (l) lock, (s) suspend, (h) hibernate, (r) reboot, (p) poweroff
+mode "$mode_system" {
+    bindsym l exec /home/abhmul/.config/i3/lock.sh, mode "default"
+    bindsym s exec systemctl suspend, mode "default"
+    bindsym h exec systemctl hibernate, mode "default"
+    bindsym r exec systemctl reboot
+    bindsym p exec systemctl poweroff
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+Shift+p mode "$mode_system"
+
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
+# bindsym $mod+d exec dmenu_run
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
-# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
 # change focus
 bindsym $mod+j focus left
@@ -153,5 +194,4 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         status_command i3status
-        tray_output primary
 }
